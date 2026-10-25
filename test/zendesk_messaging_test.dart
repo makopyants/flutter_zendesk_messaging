@@ -56,6 +56,18 @@ void main() {
       expect(result, isA<bool>());
     });
 
+    test('setLocale sends the language tag', () async {
+      await ZendeskMessaging.setLocale('az-AZ');
+
+      expect(log, hasLength(1));
+      expect(log.first.method, 'setLocale');
+      expect(log.first.arguments['languageTag'], 'az-AZ');
+    });
+
+    test('setLocale throws ArgumentError for an empty tag', () async {
+      expect(() => ZendeskMessaging.setLocale(''), throwsArgumentError);
+    });
+
     test('invalidate calls native method', () async {
       await ZendeskMessaging.invalidate();
 
@@ -552,6 +564,8 @@ dynamic _handleMockMethodCall(MethodCall methodCall) {
       return null;
     case 'isInitialized':
       return true;
+    case 'setLocale':
+      return null;
     case 'invalidate':
       return null;
     case 'loginUser':

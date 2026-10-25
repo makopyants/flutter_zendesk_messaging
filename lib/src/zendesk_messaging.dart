@@ -180,6 +180,33 @@ class ZendeskMessaging {
     }
   }
 
+  /// Report the app's language to Zendesk in place of the device's.
+  ///
+  /// The Android SDK writes its app context's locale over the Zendesk user's
+  /// locale on every user refresh, starting inside [initialize], so call this
+  /// before it and again whenever the app's language changes. iOS ignores it.
+  ///
+  /// [languageTag] A BCP 47 tag, e.g. `ru-RU`.
+  ///
+  /// Throws [ArgumentError] if [languageTag] is empty.
+  static Future<void> setLocale(String languageTag) async {
+    if (languageTag.isEmpty) {
+      throw ArgumentError('languageTag cannot be empty');
+    }
+
+    try {
+      await _channel.invokeMethod('setLocale', {'languageTag': languageTag});
+      ZendeskMessagingConfig.log('Locale set: $languageTag');
+    } catch (e, stackTrace) {
+      ZendeskMessagingConfig.logError(
+        'setLocale failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   // ============================================================================
   // UI Navigation
   // ============================================================================

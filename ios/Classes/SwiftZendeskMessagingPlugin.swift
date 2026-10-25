@@ -134,6 +134,10 @@ public class SwiftZendeskMessagingPlugin: NSObject, FlutterPlugin {
             }
             result(zendeskMessaging?.getConnectionStatus() ?? "unknown")
 
+        case "setLocale":
+            // Android only: the iOS SDK keeps reporting the device's language.
+            result(nil)
+
         case "isInitialized":
             result(handleInitializedStatus())
 

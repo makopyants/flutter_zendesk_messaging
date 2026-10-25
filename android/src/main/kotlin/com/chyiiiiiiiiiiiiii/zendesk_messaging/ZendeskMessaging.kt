@@ -10,10 +10,12 @@ import zendesk.android.messaging.MessagingScreen
 import zendesk.messaging.android.DefaultMessagingFactory
 import zendesk.messaging.android.push.PushNotifications
 import zendesk.messaging.android.push.PushResponsibility
+import java.util.Locale
 
 class ZendeskMessaging(
     private val plugin: ZendeskMessagingPlugin,
-    private val channel: MethodChannel
+    private val channel: MethodChannel,
+    private val appContext: AppLocaleContext
 ) {
     companion object {
         const val TAG = "[ZendeskMessaging]"
@@ -313,7 +315,7 @@ class ZendeskMessaging(
     fun initialize(channelKey: String, result: MethodChannel.Result) {
         println("$TAG - Channel Key - $channelKey")
         Zendesk.initialize(
-            plugin.activity!!,
+            appContext,
             channelKey,
             successCallback = { value ->
                 plugin.isInitialized = true
@@ -327,6 +329,11 @@ class ZendeskMessaging(
             },
             messagingFactory = DefaultMessagingFactory()
         )
+    }
+
+    fun setLocale(languageTag: String) {
+        appContext.locale = Locale.forLanguageTag(languageTag)
+        println("$TAG - setLocale: $languageTag")
     }
 
     fun invalidate() {

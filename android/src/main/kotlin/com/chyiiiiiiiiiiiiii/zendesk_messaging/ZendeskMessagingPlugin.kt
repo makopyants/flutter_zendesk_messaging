@@ -22,7 +22,11 @@ class ZendeskMessagingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "zendesk_messaging")
         channel.setMethodCallHandler(this)
-        zendeskMessaging = ZendeskMessaging(this, channel)
+        zendeskMessaging = ZendeskMessaging(
+            this,
+            channel,
+            AppLocaleContext(flutterPluginBinding.applicationContext)
+        )
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -30,6 +34,17 @@ class ZendeskMessagingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             "initialize" -> {
                 val channelKey = call.argument<String>("channelKey")!!
                 zendeskMessaging.initialize(channelKey, result)
+            }
+
+            // No init guard: initialize refreshes a restored user, reporting the locale.
+            "setLocale" -> {
+                val languageTag = call.argument<String>("languageTag")
+                if (languageTag.isNullOrEmpty()) {
+                    result.error("invalid_argument", "languageTag is required", null)
+                    return
+                }
+                zendeskMessaging.setLocale(languageTag)
+                result.success(null)
             }
 
             "show" -> {
